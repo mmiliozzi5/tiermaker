@@ -6,6 +6,7 @@ import { useSession } from "@/hooks/useSession";
 import { useRealtimeParticipants } from "@/hooks/useRealtimeParticipants";
 import { ParticipantStatus } from "@/components/ParticipantStatus";
 import { createClient } from "@/lib/supabase/client";
+import { addToTierlistHistory, removeFromTierlistHistory } from "@/lib/localStorage";
 import type { Tierlist, Participant } from "@/types";
 
 export default function LobbyPage() {
@@ -17,6 +18,8 @@ export default function LobbyPage() {
   const [initialParticipants, setInitialParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const upperCode = code.toUpperCase();
 
@@ -58,6 +61,8 @@ export default function LobbyPage() {
       return;
     }
 
+    addToTierlistHistory({ code: upperCode, name: tl.name, joined_at: new Date().toISOString() });
+
     setTierlist(tl);
     setInitialParticipants(parts ?? []);
     setCode(upperCode);
@@ -74,7 +79,7 @@ export default function LobbyPage() {
     loadData();
   }, [hydrated, name, loadData, router, upperCode]);
 
-  const { participants, tierlistStatus } = useRealtimeParticipants(
+  const { participants, tierlistStatus, tierlistDeleted } = useRealtimeParticipants(
     tierlist?.id ?? "",
     initialParticipants,
     tierlist?.status ?? "open"
@@ -94,6 +99,12 @@ export default function LobbyPage() {
     }
   }, [tierlistStatus, allConfirmed, upperCode, router]);
 
+  useEffect(() => {
+    if (tierlistDeleted) {
+      router.push("/");
+    }
+  }, [tierlistDeleted, router]);
+
   function copyCode() {
     navigator.clipboard.writeText(upperCode);
     setCopied(true);
@@ -106,6 +117,16 @@ export default function LobbyPage() {
       `Unite a mi TierMaker! Código: *${upperCode}* — Entrá acá: ${url}`
     );
     window.open(`https://wa.me/?text=${msg}`, "_blank");
+  }
+
+  async function handleDelete() {
+    if (!tierlist) return;
+    setDeleting(true);
+    const supabase = createClient();
+    await supabase.from("tierlists").delete().eq("id", tierlist.id);
+    removeFromTierlistHistory(upperCode);
+    setCode("");
+    router.push("/");
   }
 
   if (!hydrated || loading) {
@@ -202,6 +223,42 @@ export default function LobbyPage() {
             </button>
           )}
         </div>
+
+        {/* Eliminar tierlist (solo host, solo mientras está abierta) */}
+        {isHost && !showDeleteConfirm && (
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="mt-2 text-gray-600 hover:text-red-400 text-xs text-center transition-colors"
+          >
+            Eliminar esta tierlist
+          </button>
+        )}
+
+        {isHost && showDeleteConfirm && (
+          <div className="bg-red-950/40 border border-red-800 rounded-xl p-4 flex flex-col gap-3">
+            <p className="text-red-300 text-sm text-center font-medium">
+              ¿Eliminar la tierlist?
+            </p>
+            <p className="text-gray-400 text-xs text-center">
+              Se borrarán todos los ítems y rankings. Esta acción no se puede deshacer.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-bold py-2 rounded-lg transition-colors"
+              >
+                {deleting ? "Eliminando..." : "Sí, eliminar"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

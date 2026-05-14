@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { uploadItemImage } from "@/lib/storage";
 import { generateCode } from "@/lib/codes";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/scoring";
+import { addToTierlistHistory } from "@/lib/localStorage";
 import type { TierFormat, RankingMethod } from "@/types";
 
 interface LocalItem {
@@ -205,6 +206,7 @@ export default function CreatePage() {
       name,
     });
 
+    addToTierlistHistory({ code, name: tierlistName.trim(), joined_at: new Date().toISOString() });
     setCode(code);
     router.push(`/${code}`);
   }

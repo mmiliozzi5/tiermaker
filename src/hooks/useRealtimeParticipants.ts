@@ -13,6 +13,7 @@ export function useRealtimeParticipants(
     useState<Participant[]>(initialParticipants);
   const [tierlistStatus, setTierlistStatus] =
     useState<TierlistStatus>(initialStatus);
+  const [tierlistDeleted, setTierlistDeleted] = useState(false);
 
   // Sincronizar cuando loadData termina y actualiza initialParticipants
   useEffect(() => {
@@ -66,6 +67,19 @@ export function useRealtimeParticipants(
           }
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "tierlists",
+        },
+        (payload) => {
+          if (payload.old?.id === tierId) {
+            setTierlistDeleted(true);
+          }
+        }
+      )
       .subscribe();
 
     return () => {
@@ -73,5 +87,5 @@ export function useRealtimeParticipants(
     };
   }, [tierId]);
 
-  return { participants, tierlistStatus };
+  return { participants, tierlistStatus, tierlistDeleted };
 }

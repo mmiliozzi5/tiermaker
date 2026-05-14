@@ -4,6 +4,16 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "@/hooks/useSession";
 import { createClient } from "@/lib/supabase/client";
+import {
+  getTierlistHistory,
+  addToTierlistHistory,
+  removeFromTierlistHistory,
+  type HistoryEntry,
+} from "@/lib/localStorage";
+
+interface HistoryEntryWithStatus extends HistoryEntry {
+  status: "open" | "finished";
+}
 
 function HomeContent() {
   const router = useRouter();
@@ -18,25 +28,53 @@ function HomeContent() {
   const [nameInput, setNameInput] = useState(name);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<HistoryEntryWithStatus[]>([]);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   const hasContinue = hydrated && Boolean(name) && Boolean(code);
 
-  // Cuando carga con ?join=CODE, enfocar el input de nombre
   useEffect(() => {
     if (hydrated && joinParam) {
       nameInputRef.current?.focus();
     }
   }, [hydrated, joinParam]);
 
-  // Sincronizar nameInput con el nombre guardado tras hidratación
   useEffect(() => {
     if (hydrated && name) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setNameInput(name);
     }
   }, [hydrated, name]);
+
+  // Cargar historial y sus estados actuales desde Supabase
+  useEffect(() => {
+    if (!hydrated) return;
+    const localHistory = getTierlistHistory();
+    if (localHistory.length === 0) return;
+
+    const supabase = createClient();
+    supabase
+      .from("tierlists")
+      .select("code, status, name")
+      .in("code", localHistory.map((h) => h.code))
+      .then(({ data }) => {
+        const found = new Map((data ?? []).map((t) => [t.code, t]));
+        // Eliminar del historial local las tierlists que ya no existen en DB
+        localHistory.forEach((h) => {
+          if (!found.has(h.code)) removeFromTierlistHistory(h.code);
+        });
+        setHistory(
+          localHistory
+            .filter((h) => found.has(h.code))
+            .map((h) => ({
+              ...h,
+              name: found.get(h.code)!.name,
+              status: found.get(h.code)!.status as "open" | "finished",
+            }))
+        );
+      });
+  }, [hydrated]);
 
   function handleNameChange(value: string) {
     setNameInput(value);
@@ -119,9 +157,18 @@ function HomeContent() {
       }
     }
 
+    addToTierlistHistory({ code: trimmedCode, name: tierlist.name, joined_at: new Date().toISOString() });
     setName(trimmedName);
     setCode(trimmedCode);
     router.push(`/${trimmedCode}`);
+  }
+
+  function navigateToTierlist(entry: HistoryEntryWithStatus) {
+    if (entry.status === "finished") {
+      router.push(`/${entry.code}/results`);
+    } else {
+      router.push(`/${entry.code}`);
+    }
   }
 
   if (!hydrated) return null;
@@ -256,6 +303,43 @@ function HomeContent() {
             <p className="mt-3 text-red-400 text-sm text-center">{error}</p>
           )}
         </div>
+
+        {/* Historial de tierlists */}
+        {history.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest mb-3">
+              Tierlists anteriores
+            </h2>
+            <div className="flex flex-col gap-2">
+              {history.map((entry) => (
+                <button
+                  key={entry.code}
+                  onClick={() => navigateToTierlist(entry)}
+                  className="w-full bg-gray-800 border border-gray-700 hover:border-gray-500 rounded-xl px-4 py-3 flex items-center gap-3 text-left transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{entry.name}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">
+                      {entry.code} · {new Date(entry.joined_at).toLocaleDateString("es-AR")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span
+                      className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        entry.status === "finished"
+                          ? "bg-green-900/50 text-green-400 border border-green-800"
+                          : "bg-yellow-900/50 text-yellow-400 border border-yellow-800"
+                      }`}
+                    >
+                      {entry.status === "finished" ? "Finalizada" : "En curso"}
+                    </span>
+                    <span className="text-gray-600 text-sm">→</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
