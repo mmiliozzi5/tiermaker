@@ -18,7 +18,7 @@ interface HistoryEntryWithStatus extends HistoryEntry {
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { name, code, setName, setCode, hydrated } = useSession();
+  const { name, setName, setCode, hydrated } = useSession();
 
   const joinParam = searchParams.get("join")?.toUpperCase() ?? "";
   const initialTab = joinParam ? "join" : "create";
@@ -31,8 +31,6 @@ function HomeContent() {
   const [history, setHistory] = useState<HistoryEntryWithStatus[]>([]);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
-
-  const hasContinue = hydrated && Boolean(name) && Boolean(code);
 
   useEffect(() => {
     if (hydrated && joinParam) {
@@ -183,21 +181,6 @@ function HomeContent() {
             Creá o participá en tierlists colaborativas
           </p>
         </div>
-
-        {/* Banner continuar sesión */}
-        {hasContinue && !joinParam && (
-          <div className="mb-4 p-3 bg-blue-900/40 border border-blue-800 rounded-xl flex items-center justify-between gap-2">
-            <p className="text-sky-300 text-sm">
-              Sesión activa como <strong>{name}</strong>
-            </p>
-            <button
-              onClick={() => router.push(`/${code}`)}
-              className="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg flex-shrink-0 hover:bg-blue-500 transition-colors"
-            >
-              Continuar
-            </button>
-          </div>
-        )}
 
         {/* Card */}
         <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 shadow-xl">
