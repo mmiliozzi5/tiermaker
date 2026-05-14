@@ -35,7 +35,7 @@ export function Podium({ top3 }: Props) {
             >
               <span className="text-4xl">{medal.emoji}</span>
               <div
-                className="w-14 h-14 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0 flex items-center justify-center"
+                className="w-14 h-14 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 flex items-center justify-center"
               >
                 {item.image_url ? (
                   <Image
@@ -68,7 +68,7 @@ export function Podium({ top3 }: Props) {
               {/* Card */}
               <div className="flex flex-col items-center gap-2">
                 <span className="text-4xl">{medal.emoji}</span>
-                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-700 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-800 flex items-center justify-center">
                   {item.image_url ? (
                     <Image
                       src={item.image_url}

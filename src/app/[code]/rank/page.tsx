@@ -239,7 +239,7 @@ export default function RankPage() {
 
   if (!hydrated || loading) {
     return (
-      <div className="min-h-dvh bg-gray-900 flex items-center justify-center">
+      <div className="min-h-dvh bg-black flex items-center justify-center">
         <div className="text-gray-400">Cargando...</div>
       </div>
     );
@@ -253,7 +253,7 @@ export default function RankPage() {
     : items.length;
 
   return (
-    <main className="min-h-dvh bg-gray-900 px-4 py-6">
+    <main className="min-h-dvh bg-black px-4 py-6">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="mb-5">
@@ -295,7 +295,7 @@ export default function RankPage() {
           <button
             onClick={handleConfirm}
             disabled={submitting}
-            className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-gray-900 font-bold py-3.5 rounded-xl transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-colors text-base"
           >
             {submitting ? "Confirmando..." : "Confirmar ranking ✓"}
           </button>

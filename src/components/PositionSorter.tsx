@@ -32,10 +32,10 @@ function SortableItem({ item, index }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-center gap-3 bg-gray-800 rounded-xl p-3 border ${
+      className={`flex items-center gap-3 bg-gray-900 rounded-xl p-3 border ${
         isDragging
-          ? "border-yellow-400 shadow-lg shadow-yellow-400/20 opacity-80"
-          : "border-gray-700"
+          ? "border-sky-400 shadow-lg shadow-sky-400/20 opacity-80"
+          : "border-gray-800"
       }`}
     >
       {/* Número de posición */}
@@ -44,7 +44,7 @@ function SortableItem({ item, index }: SortableItemProps) {
       </span>
 
       {/* Imagen */}
-      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 flex items-center justify-center">
         {item.image_url ? (
           <Image
             src={item.image_url}

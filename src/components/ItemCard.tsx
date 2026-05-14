@@ -16,7 +16,7 @@ export function ItemCard({ item, avg, showAvg, size = "md" }: Props) {
   return (
     <div className="flex flex-col items-center gap-1 select-none">
       <div
-        className={`${dim} rounded-lg overflow-hidden bg-gray-700 flex items-center justify-center flex-shrink-0`}
+        className={`${dim} rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center flex-shrink-0`}
       >
         {item.image_url ? (
           <Image

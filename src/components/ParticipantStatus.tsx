@@ -11,7 +11,7 @@ export function ParticipantStatus({ participants }: Props) {
   const total = participants.length;
 
   return (
-    <div className="bg-gray-800 rounded-xl border border-gray-700 p-4">
+    <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-white">Participantes</h3>
         <span className="text-sm text-gray-400">
@@ -20,7 +20,7 @@ export function ParticipantStatus({ participants }: Props) {
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
+      <div className="w-full bg-gray-800 rounded-full h-2 mb-4">
         <div
           className="bg-green-500 h-2 rounded-full transition-all duration-500"
           style={{ width: total > 0 ? `${(confirmed / total) * 100}%` : "0%" }}
@@ -36,7 +36,7 @@ export function ParticipantStatus({ participants }: Props) {
                 ✓ Confirmado
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-xs bg-yellow-900/50 text-yellow-400 border border-yellow-700 rounded-full px-2 py-0.5">
+              <span className="flex items-center gap-1 text-xs bg-blue-900/50 text-sky-400 border border-blue-800 rounded-full px-2 py-0.5">
                 ⏳ Rankeando
               </span>
             )}

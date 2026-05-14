@@ -47,7 +47,6 @@ function HomeContent() {
     }
   }, [hydrated, name]);
 
-  // Cargar historial y sus estados actuales desde Supabase
   useEffect(() => {
     if (!hydrated) return;
     const localHistory = getTierlistHistory();
@@ -60,7 +59,6 @@ function HomeContent() {
       .in("code", localHistory.map((h) => h.code))
       .then(({ data }) => {
         const found = new Map((data ?? []).map((t) => [t.code, t]));
-        // Eliminar del historial local las tierlists que ya no existen en DB
         localHistory.forEach((h) => {
           if (!found.has(h.code)) removeFromTierlistHistory(h.code);
         });
@@ -174,12 +172,12 @@ function HomeContent() {
   if (!hydrated) return null;
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-dvh px-4 py-8 bg-gray-900">
+    <main className="flex flex-col items-center min-h-dvh px-4 pt-10 pb-10 bg-black">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            Tier<span className="text-yellow-400">Maker</span>
+            Tier<span className="text-sky-400">Maker</span>
           </h1>
           <p className="text-gray-400 text-sm">
             Creá o participá en tierlists colaborativas
@@ -188,13 +186,13 @@ function HomeContent() {
 
         {/* Banner continuar sesión */}
         {hasContinue && !joinParam && (
-          <div className="mb-4 p-3 bg-yellow-900/40 border border-yellow-700 rounded-xl flex items-center justify-between gap-2">
-            <p className="text-yellow-300 text-sm">
+          <div className="mb-4 p-3 bg-blue-900/40 border border-blue-800 rounded-xl flex items-center justify-between gap-2">
+            <p className="text-sky-300 text-sm">
               Sesión activa como <strong>{name}</strong>
             </p>
             <button
               onClick={() => router.push(`/${code}`)}
-              className="text-xs bg-yellow-500 text-gray-900 font-bold px-3 py-1.5 rounded-lg flex-shrink-0 hover:bg-yellow-400 transition-colors"
+              className="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg flex-shrink-0 hover:bg-blue-500 transition-colors"
             >
               Continuar
             </button>
@@ -202,15 +200,15 @@ function HomeContent() {
         )}
 
         {/* Card */}
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
+        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 shadow-xl">
 
           {/* Banner informativo cuando viene de un link */}
           {joinParam && (
-            <div className="mb-5 p-3 bg-yellow-900/30 border border-yellow-700/50 rounded-xl text-center">
-              <p className="text-yellow-300 text-sm font-medium">
+            <div className="mb-5 p-3 bg-blue-900/30 border border-blue-700/50 rounded-xl text-center">
+              <p className="text-sky-300 text-sm font-medium">
                 Te invitaron a una tierlist
               </p>
-              <p className="text-yellow-400 text-xl font-bold tracking-widest mt-1">
+              <p className="text-sky-400 text-xl font-bold tracking-widest mt-1">
                 {joinParam}
               </p>
             </div>
@@ -218,7 +216,7 @@ function HomeContent() {
 
           {/* Nombre */}
           <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Tu nombre
             </label>
             <input
@@ -232,18 +230,18 @@ function HomeContent() {
                 (tab === "create" ? handleCreate() : handleJoin())
               }
               maxLength={30}
-              className="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm"
+              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-base"
             />
           </div>
 
           {/* Tabs — ocultos si viene de un link directo */}
           {!joinParam && (
-            <div className="flex bg-gray-700 rounded-xl p-1 mb-5">
+            <div className="flex bg-gray-800 rounded-xl p-1 mb-5">
               <button
                 onClick={() => { setTab("create"); setError(""); }}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   tab === "create"
-                    ? "bg-yellow-500 text-gray-900"
+                    ? "bg-blue-600 text-white"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
@@ -251,9 +249,9 @@ function HomeContent() {
               </button>
               <button
                 onClick={() => { setTab("join"); setError(""); }}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   tab === "join"
-                    ? "bg-yellow-500 text-gray-900"
+                    ? "bg-blue-600 text-white"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
@@ -266,7 +264,7 @@ function HomeContent() {
           {tab === "create" && !joinParam && (
             <button
               onClick={handleCreate}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl transition-colors text-sm"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-colors text-base"
             >
               Crear nueva tierlist →
             </button>
@@ -286,13 +284,13 @@ function HomeContent() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleJoin()}
                   maxLength={6}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm tracking-widest uppercase text-center"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-base tracking-widest uppercase text-center"
                 />
               )}
               <button
                 onClick={handleJoin}
                 disabled={loading}
-                className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-gray-900 font-bold py-3 rounded-xl transition-colors text-sm"
+                className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-colors text-base"
               >
                 {loading ? "Uniéndome..." : "Unirme a la tierlist →"}
               </button>
@@ -315,7 +313,7 @@ function HomeContent() {
                 <button
                   key={entry.code}
                   onClick={() => navigateToTierlist(entry)}
-                  className="w-full bg-gray-800 border border-gray-700 hover:border-gray-500 rounded-xl px-4 py-3 flex items-center gap-3 text-left transition-colors"
+                  className="w-full bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl px-4 py-3 flex items-center gap-3 text-left transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium truncate">{entry.name}</p>
@@ -328,7 +326,7 @@ function HomeContent() {
                       className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                         entry.status === "finished"
                           ? "bg-green-900/50 text-green-400 border border-green-800"
-                          : "bg-yellow-900/50 text-yellow-400 border border-yellow-800"
+                          : "bg-blue-900/50 text-sky-400 border border-blue-800"
                       }`}
                     >
                       {entry.status === "finished" ? "Finalizada" : "En curso"}

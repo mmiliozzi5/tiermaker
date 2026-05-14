@@ -43,7 +43,6 @@ export default function CreatePage() {
     }
   }, [hydrated, name, router]);
 
-  // Step 1: nombre de tierlist
   function handleStep1() {
     if (!tierlistName.trim()) {
       setError("Ingresá un nombre para la tierlist");
@@ -53,19 +52,16 @@ export default function CreatePage() {
     setStep(2);
   }
 
-  // Step 2: formato
   function handleStep2(format: TierFormat) {
     setTierFormat(format);
     setStep(3);
   }
 
-  // Step 3: método de ranking
   function handleStep3(method: RankingMethod) {
     setRankingMethod(method);
     setStep(4);
   }
 
-  // Step 4: agregar ítem
   function handleAddItem() {
     if (!itemName.trim()) {
       setError("Ingresá un nombre para el ítem");
@@ -112,8 +108,6 @@ export default function CreatePage() {
       )
     );
 
-    // Necesitamos el código para el path, usamos un temp code durante creación
-    // La imagen se sube después con el código real en handleCreate
     setItems((prev) =>
       prev.map((it) =>
         it.id === itemId ? { ...it, uploading: false } : it
@@ -139,7 +133,6 @@ export default function CreatePage() {
     const supabase = createClient();
     let code = generateCode();
 
-    // Generar código único
     let attempts = 0;
     while (attempts < 5) {
       const { data } = await supabase
@@ -152,7 +145,6 @@ export default function CreatePage() {
       attempts++;
     }
 
-    // Crear tierlist
     const { data: tierlist, error: tlErr } = await supabase
       .from("tierlists")
       .insert({
@@ -172,7 +164,6 @@ export default function CreatePage() {
       return;
     }
 
-    // Subir imágenes y crear ítems
     const itemsToInsert = await Promise.all(
       items.map(async (item, idx) => {
         let imageUrl: string | null = null;
@@ -200,7 +191,6 @@ export default function CreatePage() {
       return;
     }
 
-    // Insertar host como participante
     await supabase.from("participants").insert({
       tierlist_id: tierlist.id,
       name,
@@ -214,7 +204,7 @@ export default function CreatePage() {
   if (!hydrated) return null;
 
   return (
-    <main className="min-h-dvh bg-gray-900 px-4 py-8">
+    <main className="min-h-dvh bg-black px-4 py-8">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -229,7 +219,7 @@ export default function CreatePage() {
               <div
                 key={s}
                 className={`flex-1 h-1 rounded-full transition-colors ${
-                  s <= step ? "bg-yellow-400" : "bg-gray-700"
+                  s <= step ? "bg-sky-400" : "bg-gray-800"
                 }`}
               />
             ))}
@@ -238,7 +228,7 @@ export default function CreatePage() {
 
         {/* Step 1: Nombre */}
         {step === 1 && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
             <h2 className="text-xl font-bold text-white mb-1">¿Cómo se llama tu tierlist?</h2>
             <p className="text-gray-400 text-sm mb-5">Dale un nombre descriptivo</p>
             <input
@@ -249,12 +239,12 @@ export default function CreatePage() {
               onKeyDown={(e) => e.key === "Enter" && handleStep1()}
               maxLength={60}
               autoFocus
-              className="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm mb-4"
+              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-base mb-4"
             />
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button
               onClick={handleStep1}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl transition-colors text-sm"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-colors text-base"
             >
               Siguiente →
             </button>
@@ -263,7 +253,7 @@ export default function CreatePage() {
 
         {/* Step 2: Formato de tiers */}
         {step === 2 && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
             <h2 className="text-xl font-bold text-white mb-1">Formato de tiers</h2>
             <p className="text-gray-400 text-sm mb-5">¿Cómo querés mostrar los tiers?</p>
             <div className="flex flex-col gap-3">
@@ -271,7 +261,7 @@ export default function CreatePage() {
                 <button
                   key={fmt}
                   onClick={() => handleStep2(fmt)}
-                  className="bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-yellow-400 rounded-xl p-4 text-left transition-all"
+                  className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-sky-400 rounded-xl p-4 text-left transition-all"
                 >
                   <p className="font-semibold text-white mb-2">
                     {fmt === "letters" ? "Letras (S / A / B / C / D)" : "Números (1 / 2 / 3 / 4 / 5)"}
@@ -295,30 +285,30 @@ export default function CreatePage() {
 
         {/* Step 3: Método de ranking */}
         {step === 3 && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
             <h2 className="text-xl font-bold text-white mb-1">Método de ranking</h2>
             <p className="text-gray-400 text-sm mb-5">¿Cómo rankearán los participantes?</p>
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => handleStep3("score")}
-                className="bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-yellow-400 rounded-xl p-4 text-left transition-all"
+                className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-sky-400 rounded-xl p-4 text-left transition-all"
               >
                 <p className="font-semibold text-white mb-1">Puntaje (0 a 10)</p>
                 <p className="text-gray-400 text-sm">Cada participante le pone una nota del 0 al 10 a cada ítem (ej: 7,5)</p>
                 <div className="mt-3 flex items-center gap-2">
                   <span className="text-sm text-gray-300">Jurassic Park</span>
-                  <div className="bg-gray-600 border border-gray-500 rounded px-2 py-1 text-yellow-400 text-sm font-mono">8,5</div>
+                  <div className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sky-400 text-sm font-mono">8,5</div>
                 </div>
               </button>
               <button
                 onClick={() => handleStep3("position")}
-                className="bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-yellow-400 rounded-xl p-4 text-left transition-all"
+                className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-sky-400 rounded-xl p-4 text-left transition-all"
               >
                 <p className="font-semibold text-white mb-1">Posicionamiento</p>
                 <p className="text-gray-400 text-sm">Cada participante ordena los ítems de mejor a peor arrastrándolos</p>
                 <div className="mt-3 flex flex-col gap-1">
                   {["1° El Padrino", "2° Pulp Fiction", "3° Matrix"].map((ex) => (
-                    <div key={ex} className="flex items-center gap-2 bg-gray-600 rounded px-2 py-1">
+                    <div key={ex} className="flex items-center gap-2 bg-gray-700 rounded px-2 py-1">
                       <span className="text-gray-400 text-xs">⠿</span>
                       <span className="text-gray-300 text-xs">{ex}</span>
                     </div>
@@ -332,13 +322,12 @@ export default function CreatePage() {
         {/* Step 4: Agregar ítems */}
         {step === 4 && (
           <div>
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 mb-4">
+            <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-4">
               <h2 className="text-xl font-bold text-white mb-1">Agregá los ítems</h2>
               <p className="text-gray-400 text-sm mb-5">
                 {items.length}/20 ítems — cada ítem puede tener una foto
               </p>
 
-              {/* Form agregar ítem */}
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
@@ -347,12 +336,12 @@ export default function CreatePage() {
                   onChange={(e) => { setItemName(e.target.value); setError(""); }}
                   onKeyDown={(e) => e.key === "Enter" && handleAddItem()}
                   maxLength={40}
-                  className="flex-1 bg-gray-700 border border-gray-600 rounded-xl px-3 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm"
+                  className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-base"
                 />
                 <button
                   onClick={handleAddItem}
                   disabled={items.length >= 20}
-                  className="bg-yellow-500 hover:bg-yellow-400 disabled:opacity-40 text-gray-900 font-bold px-4 py-2.5 rounded-xl transition-colors text-sm flex-shrink-0"
+                  className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-bold px-4 py-3 rounded-xl transition-colors text-sm flex-shrink-0"
                 >
                   + Agregar
                 </button>
@@ -366,16 +355,15 @@ export default function CreatePage() {
                 {items.map((item, idx) => (
                   <div
                     key={item.id}
-                    className="bg-gray-800 border border-gray-700 rounded-xl p-3 flex items-center gap-3"
+                    className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex items-center gap-3"
                   >
                     <span className="text-gray-500 text-sm w-5 text-center flex-shrink-0">
                       {idx + 1}
                     </span>
 
-                    {/* Foto */}
                     <button
                       onClick={() => handleImageClick(item.id)}
-                      className="w-12 h-12 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0 flex items-center justify-center border border-dashed border-gray-600 hover:border-yellow-400 transition-colors"
+                      className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 flex items-center justify-center border border-dashed border-gray-700 hover:border-sky-400 transition-colors"
                       title="Agregar foto"
                     >
                       {item.imagePreview ? (
@@ -403,7 +391,6 @@ export default function CreatePage() {
               </div>
             )}
 
-            {/* Input file oculto */}
             <input
               ref={fileInputRef}
               type="file"
@@ -412,11 +399,10 @@ export default function CreatePage() {
               onChange={handleFileChange}
             />
 
-            {/* Botón crear */}
             <button
               onClick={handleCreate}
               disabled={submitting || items.length === 0}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-40 text-gray-900 font-bold py-3 rounded-xl transition-colors text-sm"
+              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-bold py-4 rounded-xl transition-colors text-base"
             >
               {submitting ? "Creando tierlist..." : `Crear tierlist con ${items.length} ítem${items.length !== 1 ? "s" : ""} →`}
             </button>

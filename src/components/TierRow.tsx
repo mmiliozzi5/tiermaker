@@ -24,7 +24,7 @@ export function TierRow({ tier, items, showAvg }: Props) {
       </div>
 
       {/* Ítems */}
-      <div className="flex-1 bg-gray-800 border border-gray-700 border-l-0 flex flex-wrap gap-3 p-3 items-start content-start min-h-[90px]">
+      <div className="flex-1 bg-gray-900 border border-gray-800 border-l-0 flex flex-wrap gap-3 p-3 items-start content-start min-h-[90px]">
         {items.length === 0 ? (
           <span className="text-gray-500 text-sm self-center">— vacío —</span>
         ) : (

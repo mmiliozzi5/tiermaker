@@ -131,7 +131,7 @@ export default function LobbyPage() {
 
   if (!hydrated || loading) {
     return (
-      <div className="min-h-dvh bg-gray-900 flex items-center justify-center">
+      <div className="min-h-dvh bg-black flex items-center justify-center">
         <div className="text-gray-400">Cargando...</div>
       </div>
     );
@@ -140,7 +140,7 @@ export default function LobbyPage() {
   if (!tierlist) return null;
 
   return (
-    <main className="min-h-dvh bg-gray-900 px-4 py-8">
+    <main className="min-h-dvh bg-black px-4 py-8">
       <div className="max-w-md mx-auto flex flex-col gap-4">
         {/* Header */}
         <div className="text-center">
@@ -151,23 +151,23 @@ export default function LobbyPage() {
         </div>
 
         {/* Código + Compartir */}
-        <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800">
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-2 text-center">
             Código de la tierlist
           </p>
-          <p className="text-4xl font-bold text-yellow-400 text-center tracking-widest mb-4">
+          <p className="text-4xl font-bold text-sky-400 text-center tracking-widest mb-4">
             {upperCode}
           </p>
           <div className="flex gap-2">
             <button
               onClick={copyCode}
-              className="flex-1 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white text-sm font-medium py-2.5 rounded-xl transition-colors"
+              className="flex-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-medium py-3 rounded-xl transition-colors"
             >
               {copied ? "✓ Copiado" : "Copiar código"}
             </button>
             <button
               onClick={shareWhatsApp}
-              className="flex-1 bg-green-700 hover:bg-green-600 text-white text-sm font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 bg-green-700 hover:bg-green-600 text-white text-sm font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-1.5"
             >
               <span>📱</span> WhatsApp
             </button>
@@ -175,7 +175,7 @@ export default function LobbyPage() {
         </div>
 
         {/* Info de la tierlist */}
-        <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
           <div className="flex gap-4 text-sm">
             <div className="flex-1 text-center">
               <p className="text-gray-400 text-xs mb-1">Formato</p>
@@ -183,7 +183,7 @@ export default function LobbyPage() {
                 {tierlist.tier_format === "letters" ? "S / A / B / C / D" : "1 / 2 / 3 / 4 / 5"}
               </p>
             </div>
-            <div className="w-px bg-gray-700" />
+            <div className="w-px bg-gray-800" />
             <div className="flex-1 text-center">
               <p className="text-gray-400 text-xs mb-1">Método</p>
               <p className="text-white font-medium">
@@ -201,7 +201,7 @@ export default function LobbyPage() {
           {myStatus === "ranking" && (
             <button
               onClick={() => router.push(`/${upperCode}/rank`)}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-colors text-base"
             >
               Empezar a rankear →
             </button>
@@ -217,14 +217,14 @@ export default function LobbyPage() {
           {allConfirmed && (
             <button
               onClick={() => router.push(`/${upperCode}/results`)}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-colors text-base"
             >
               Ver resultados 🏆
             </button>
           )}
         </div>
 
-        {/* Eliminar tierlist (solo host, solo mientras está abierta) */}
+        {/* Eliminar tierlist (solo host) */}
         {isHost && !showDeleteConfirm && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
@@ -245,14 +245,14 @@ export default function LobbyPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                className="flex-1 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-bold py-2 rounded-lg transition-colors"
+                className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
               >
                 {deleting ? "Eliminando..." : "Sí, eliminar"}
               </button>

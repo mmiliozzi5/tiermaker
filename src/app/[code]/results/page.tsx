@@ -71,11 +71,11 @@ export default async function ResultsPage({ params }: Props) {
     .slice(0, 3);
 
   return (
-    <main className="min-h-dvh bg-gray-900 px-4 py-8">
+    <main className="min-h-dvh bg-black px-4 py-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <p className="text-yellow-400 text-sm font-medium uppercase tracking-widest mb-1">
+          <p className="text-sky-400 text-sm font-medium uppercase tracking-widest mb-1">
             Resultados finales
           </p>
           <h1 className="text-2xl font-bold text-white">{tierlist.name}</h1>
@@ -100,8 +100,8 @@ export default async function ResultsPage({ params }: Props) {
         <Podium top3={top3} />
 
         {/* Tabla de todos los ítems */}
-        <div className="mt-8 bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-700">
+        <div className="mt-8 bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-800">
             <h3 className="font-semibold text-white text-sm">Ranking completo</h3>
           </div>
           <div className="divide-y divide-gray-700">
