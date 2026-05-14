@@ -14,7 +14,16 @@ export function useRealtimeParticipants(
   const [tierlistStatus, setTierlistStatus] =
     useState<TierlistStatus>(initialStatus);
 
+  // Sincronizar cuando loadData termina y actualiza initialParticipants
   useEffect(() => {
+    if (initialParticipants.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setParticipants(initialParticipants);
+    }
+  }, [initialParticipants]);
+
+  useEffect(() => {
+    if (!tierId) return;
     const supabase = createClient();
 
     const channel = supabase
@@ -29,10 +38,7 @@ export function useRealtimeParticipants(
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setParticipants((prev) => [
-              ...prev,
-              payload.new as Participant,
-            ]);
+            setParticipants((prev) => [...prev, payload.new as Participant]);
           } else if (payload.eventType === "UPDATE") {
             setParticipants((prev) =>
               prev.map((p) =>
