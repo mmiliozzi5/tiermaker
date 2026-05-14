@@ -35,15 +35,13 @@ export function ScoreInput({ items, values, onChange }: Props) {
           {/* Nombre */}
           <span className="flex-1 text-white font-medium text-sm">{item.name}</span>
 
-          {/* Input */}
+          {/* Input — acepta punto y coma como separador decimal */}
           <input
-            type="number"
-            min="0"
-            max="10"
-            step="0.1"
+            type="text"
+            inputMode="decimal"
             placeholder="0-10"
             value={values[item.id] ?? ""}
-            onChange={(e) => onChange(item.id, e.target.value)}
+            onChange={(e) => onChange(item.id, e.target.value.replace(",", "."))}
             className="w-20 bg-gray-700 border border-gray-600 rounded-lg px-2 py-2 text-white text-center text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
           />
         </div>
