@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useSession } from "@/hooks/useSession";
 import { createClient } from "@/lib/supabase/client";
 import { uploadItemImage } from "@/lib/storage";
@@ -378,11 +377,10 @@ export default function CreatePage() {
                       title="Agregar foto"
                     >
                       {item.imagePreview ? (
-                        <Image
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
                           src={item.imagePreview}
                           alt={item.name}
-                          width={48}
-                          height={48}
                           className="object-cover w-full h-full"
                         />
                       ) : (
