@@ -54,7 +54,7 @@ export default function LobbyPage() {
     );
 
     if (!me) {
-      router.push("/");
+      router.push(`/?join=${upperCode}`);
       return;
     }
 
@@ -67,12 +67,12 @@ export default function LobbyPage() {
   useEffect(() => {
     if (!hydrated) return;
     if (!name) {
-      router.push("/");
+      router.push(`/?join=${upperCode}`);
       return;
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
-  }, [hydrated, name, loadData, router]);
+  }, [hydrated, name, loadData, router, upperCode]);
 
   const { participants, tierlistStatus } = useRealtimeParticipants(
     tierlist?.id ?? "",

@@ -1,20 +1,42 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "@/hooks/useSession";
 import { createClient } from "@/lib/supabase/client";
 
-export default function HomePage() {
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { name, code, setName, setCode, hydrated } = useSession();
-  const [tab, setTab] = useState<"create" | "join">("create");
-  const [joinCode, setJoinCode] = useState("");
+
+  const joinParam = searchParams.get("join")?.toUpperCase() ?? "";
+  const initialTab = joinParam ? "join" : "create";
+
+  const [tab, setTab] = useState<"create" | "join">(initialTab);
+  const [joinCode, setJoinCode] = useState(joinParam);
   const [nameInput, setNameInput] = useState(name);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
   const hasContinue = hydrated && Boolean(name) && Boolean(code);
+
+  // Cuando carga con ?join=CODE, enfocar el input de nombre
+  useEffect(() => {
+    if (hydrated && joinParam) {
+      nameInputRef.current?.focus();
+    }
+  }, [hydrated, joinParam]);
+
+  // Sincronizar nameInput con el nombre guardado tras hidratación
+  useEffect(() => {
+    if (hydrated && name) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNameInput(name);
+    }
+  }, [hydrated, name]);
 
   function handleNameChange(value: string) {
     setNameInput(value);
@@ -118,7 +140,7 @@ export default function HomePage() {
         </div>
 
         {/* Banner continuar sesión */}
-        {hasContinue && (
+        {hasContinue && !joinParam && (
           <div className="mb-4 p-3 bg-yellow-900/40 border border-yellow-700 rounded-xl flex items-center justify-between gap-2">
             <p className="text-yellow-300 text-sm">
               Sesión activa como <strong>{name}</strong>
@@ -134,12 +156,26 @@ export default function HomePage() {
 
         {/* Card */}
         <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
+
+          {/* Banner informativo cuando viene de un link */}
+          {joinParam && (
+            <div className="mb-5 p-3 bg-yellow-900/30 border border-yellow-700/50 rounded-xl text-center">
+              <p className="text-yellow-300 text-sm font-medium">
+                Te invitaron a una tierlist
+              </p>
+              <p className="text-yellow-400 text-xl font-bold tracking-widest mt-1">
+                {joinParam}
+              </p>
+            </div>
+          )}
+
           {/* Nombre */}
           <div className="mb-5">
             <label className="block text-sm font-medium text-gray-300 mb-1.5">
               Tu nombre
             </label>
             <input
+              ref={nameInputRef}
               type="text"
               placeholder="Ej: Maxi"
               value={nameInput}
@@ -153,37 +189,34 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Tabs */}
-          <div className="flex bg-gray-700 rounded-xl p-1 mb-5">
-            <button
-              onClick={() => {
-                setTab("create");
-                setError("");
-              }}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                tab === "create"
-                  ? "bg-yellow-500 text-gray-900"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              Crear tierlist
-            </button>
-            <button
-              onClick={() => {
-                setTab("join");
-                setError("");
-              }}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                tab === "join"
-                  ? "bg-yellow-500 text-gray-900"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              Unirme
-            </button>
-          </div>
+          {/* Tabs — ocultos si viene de un link directo */}
+          {!joinParam && (
+            <div className="flex bg-gray-700 rounded-xl p-1 mb-5">
+              <button
+                onClick={() => { setTab("create"); setError(""); }}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  tab === "create"
+                    ? "bg-yellow-500 text-gray-900"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Crear tierlist
+              </button>
+              <button
+                onClick={() => { setTab("join"); setError(""); }}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  tab === "join"
+                    ? "bg-yellow-500 text-gray-900"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Unirme
+              </button>
+            </div>
+          )}
 
-          {tab === "create" && (
+          {/* Crear */}
+          {tab === "create" && !joinParam && (
             <button
               onClick={handleCreate}
               className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl transition-colors text-sm"
@@ -192,26 +225,29 @@ export default function HomePage() {
             </button>
           )}
 
-          {tab === "join" && (
+          {/* Unirse — código pre-cargado si viene de link */}
+          {(tab === "join" || joinParam) && (
             <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                placeholder="Código (ej: AB12CD)"
-                value={joinCode}
-                onChange={(e) => {
-                  setJoinCode(e.target.value.toUpperCase());
-                  setError("");
-                }}
-                onKeyDown={(e) => e.key === "Enter" && handleJoin()}
-                maxLength={6}
-                className="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm tracking-widest uppercase text-center"
-              />
+              {!joinParam && (
+                <input
+                  type="text"
+                  placeholder="Código (ej: AB12CD)"
+                  value={joinCode}
+                  onChange={(e) => {
+                    setJoinCode(e.target.value.toUpperCase());
+                    setError("");
+                  }}
+                  onKeyDown={(e) => e.key === "Enter" && handleJoin()}
+                  maxLength={6}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm tracking-widest uppercase text-center"
+                />
+              )}
               <button
                 onClick={handleJoin}
                 disabled={loading}
                 className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-gray-900 font-bold py-3 rounded-xl transition-colors text-sm"
               >
-                {loading ? "Uniéndome..." : "Unirme →"}
+                {loading ? "Uniéndome..." : "Unirme a la tierlist →"}
               </button>
             </div>
           )}
@@ -222,5 +258,13 @@ export default function HomePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }
